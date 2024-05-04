@@ -4,12 +4,16 @@ const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const app = express();
-const server = require("http").createServer(app);
-const io = require("socket.io")(server, {
+const Server = require("socket.io");
+const HttpsServer = require("https").createServer(app);
+// const server = require("http").createServer(app);
+const io = Server(HttpsServer, {
   cors: {
     origin: process.env.CLIENT_URL || "http://localhost:3000",
   },
 });
+console.log(Server);
+console.log(HttpsServer);
 
 // Connect DB
 require("./db/connection");
@@ -255,6 +259,6 @@ app.get("/api/users", async (req, res) => {
     console.log(error, "Error");
   }
 });
-server.listen(port, () => {
+HttpsServer.listen(port, () => {
   console.log("listening on port " + port);
 });
