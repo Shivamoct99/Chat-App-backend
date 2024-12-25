@@ -1,7 +1,28 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const Schema = mongoose.Schema;
+const bcrypt = require("bcrypt");
 
-const userSchema = mongoose.Schema(
+const onlineHoursSchema = new Schema({
+  date: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
+  loginTime: {
+    type: Date,
+    default: null,
+  },
+  logoutTime: {
+    type: Date,
+    default: null,
+  },
+  onlineHours: {
+    type: Number,
+    default: 0,
+  },
+});
+
+const userSchema = new Schema(
   {
     name: {
       type: String,
@@ -12,6 +33,11 @@ const userSchema = mongoose.Schema(
       required: true,
       unique: true,
     },
+    number: {
+      type: Number,
+      // required: true,
+      // unique: true,
+    },
     password: {
       type: String,
       required: true,
@@ -21,23 +47,37 @@ const userSchema = mongoose.Schema(
       default:
         "https://res.cloudinary.com/lostcoder/image/upload/v1729622453/np1y8ip8rdnhh3dv0en2.png",
     },
-    token: { type: String },
+    loggedIn: {
+      type: Boolean,
+      default: false,
+    },
+    isOtpRequired: {
+      type: Boolean,
+      default: false,
+    },
+    onlineLogs: [onlineHoursSchema],
+    // token: { type: String },
   },
   {
     timestamps: true,
   }
 );
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  await bcrypt.compare(enteredPassword, this.password);
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified) {
-    next();
+  if (this.isModified("password")) {
+    try {
+      const salt = await bcrypt.genSalt(10);
+      console.log(salt);
+      this.password = await bcrypt.hash(this.password, salt);
+    } catch (error) {
+      console.error(error);
+    }
   }
-  // console.log(this.password);
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  //next step which is saving data in database
+  next();
 });
 
 const Users = mongoose.model("User", userSchema);

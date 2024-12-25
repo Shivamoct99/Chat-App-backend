@@ -9,6 +9,8 @@ const io = require("socket.io")(Server, {
   },
 });
 
+const port = process.env.PORT || 8000;
+
 // Connect DB
 require("./db/connection");
 // Import Files
@@ -19,7 +21,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
-const port = process.env.PORT || 8000;
 // Socket.io
 let users = [];
 io.on("connection", (socket) => {
