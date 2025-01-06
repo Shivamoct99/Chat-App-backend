@@ -35,7 +35,7 @@ const userSchema = new Schema(
     },
     number: {
       type: Number,
-      // required: true,
+      required: true,
       // unique: true,
     },
     password: {

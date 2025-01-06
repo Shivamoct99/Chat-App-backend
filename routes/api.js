@@ -235,7 +235,7 @@ router.put("/updatePassword", async (req, res) => {
   }
 });
 
-router.post("/forgotPassword", async (req, res) => {
+router.post("/sendOtp", async (req, res) => {
   const { email } = req.body;
 
   try {
@@ -251,7 +251,7 @@ router.post("/forgotPassword", async (req, res) => {
       from: process.env.NODEMAILER_USERNAME,
       to: email,
       subject: "Password Reset",
-      text: `Please enter the following OTP to reset your password: \n\n Your OTP is: ${otp}`,
+      text: `Your OTP is: ${otp}. \n\n It is valid for 5 minutes.`,
     };
 
     await sendEmail(mailOptions);
@@ -265,7 +265,6 @@ router.post("/forgotPassword", async (req, res) => {
 
 router.post("/resetPassword", async (req, res) => {
   const { email, otp, password } = req.body;
-
   try {
     const user = await Users.findOne({ email });
 
@@ -286,6 +285,28 @@ router.post("/resetPassword", async (req, res) => {
     return res.status(200).json({ message: "Password reset successfully!" });
   } catch (err) {
     console.error("Error:Resetting password!", err.message);
+    ApiError(err, res);
+  }
+});
+
+router.post("/verifyOtp", async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const user = await Users.findOne({ email });
+
+    if (!user) {
+      throw new CustomError("User not found", 404);
+    }
+
+    const isVerified = await verifyOtp(otp);
+
+    if (!isVerified) {
+      throw new CustomError("Invalid OTP", 403);
+    }
+    return res.status(200).json({ message: "Verify Otp successfully!" });
+  } catch (err) {
+    console.error("Error:Verify Otp!", err.message);
     ApiError(err, res);
   }
 });

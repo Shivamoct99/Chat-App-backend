@@ -5,7 +5,7 @@ const generateOtp = async () => {
     const token = speakeasy.totp({
       secret: process.env.SPEAKEASY_SECRET,
       encoding: process.env.SPEAKEASY_ENCODING,
-      step: 500, //valid for 5 minutes
+      step: 600, //valid for 5 minutes
     });
     return token;
   } catch (error) {
@@ -19,7 +19,7 @@ const verifyOtp = async (otp) => {
       secret: process.env.SPEAKEASY_SECRET,
       encoding: process.env.SPEAKEASY_ENCODING,
       token: otp,
-      step: 500,
+      step: 600,
     });
 
     if (!isVerified) {
