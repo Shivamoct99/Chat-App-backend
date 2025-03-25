@@ -6,6 +6,12 @@ class ApiResponse {
     this.success = statusCode < 400;
   }
 }
+const sendResponse = (res, statusCode, data, message = "") => {
+  res.status(statusCode).json({
+    message,
+    data,
+  });
+};
 
 const ApiError = (err, res) => {
   const status = err.statusCode || 500;
@@ -22,4 +28,4 @@ class CustomError extends Error {
   }
 }
 
-module.exports = { CustomError, ApiResponse, ApiError };
+module.exports = { CustomError, ApiResponse, ApiError, sendResponse };

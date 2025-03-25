@@ -7,18 +7,25 @@ const onlineHoursSchema = new Schema({
     type: Date,
     required: true,
     default: Date.now,
+    // select:false,
   },
   loginTime: {
     type: Date,
     default: null,
+    // select:false,
+
   },
   logoutTime: {
     type: Date,
     default: null,
+    // select:false,
+
   },
   onlineHours: {
     type: Number,
     default: 0,
+    // select:false,
+
   },
 });
 
@@ -41,22 +48,27 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: true,
+      select:false,
     },
     profile_pic: {
       type: String,
       default:
         "https://res.cloudinary.com/lostcoder/image/upload/v1729622453/np1y8ip8rdnhh3dv0en2.png",
     },
+    token:{
+      type:String,
+      select:false,
+    },
     loggedIn: {
       type: Boolean,
       default: false,
+      select:false,
     },
     isOtpRequired: {
       type: Boolean,
       default: false,
     },
-    onlineLogs: [onlineHoursSchema],
-    // token: { type: String },
+    onlineLogs: [onlineHoursSchema] ,
   },
   {
     timestamps: true,
@@ -70,7 +82,6 @@ userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     try {
       const salt = await bcrypt.genSalt(10);
-      console.log(salt);
       this.password = await bcrypt.hash(this.password, salt);
     } catch (error) {
       console.error(error);
@@ -80,5 +91,5 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-const Users = mongoose.model("User", userSchema);
+const Users = mongoose.model("Users", userSchema);
 module.exports = Users;
